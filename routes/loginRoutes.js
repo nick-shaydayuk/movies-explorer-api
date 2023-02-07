@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const { celebrate, Joi, Segments } = require('celebrate');
 const userRouter = require('./usersRouter');
-const movieRouter = require('./moviesRouter');
+const movieRoutes = require('./movieRoutes');
 const auth = require('../middlewares/auth');
 const { login } = require('../controllers/login');
 const { createUser } = require('../controllers/users');
@@ -33,7 +33,7 @@ router.post(
 
 router.use(auth);
 router.use('/users', userRouter);
-router.use('/cards', movieRouter);
+router.use('/movies', movieRoutes);
 
 router.use('/', (req, res, next) => {
   next(res.status(404).send({ message: 'Страница не найдена' }));

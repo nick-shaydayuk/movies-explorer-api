@@ -7,7 +7,7 @@ const NotFoundError = require('../errors/notFoundError');
 const ok = 200;
 
 module.exports.getAllMovies = (req, res, next) => {
-  Card.find({})
+  Movie.find({})
     .then((movies) => res.send(movies))
     .catch(next);
 };
