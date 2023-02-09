@@ -12,6 +12,12 @@ mongoose.connect('mongodb://localhost:27017/movies', {
   useNewUrlParser: true,
 });
 
+mongoose.connect(NODE_ENV === 'production' ? DATA_BASE : 'mongodb://localhost:27017/movies', {
+  useNewUrlParser: true,
+  useCreateIndex: true,
+  useFindAndModify: false,
+});
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

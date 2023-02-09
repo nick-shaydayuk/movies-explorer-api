@@ -7,7 +7,10 @@ const NotFoundError = require('../errors/notFoundError');
 const ok = 200;
 
 module.exports.getAllMovies = (req, res, next) => {
-  Movie.find({})
+
+  const owner = req.user._id;
+
+  Movie.find({ owner })
     .then((movies) => res.send(movies))
     .catch(next);
 };
