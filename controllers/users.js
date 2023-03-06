@@ -41,9 +41,7 @@ module.exports.getCurrentUser = (req, res, next) => {
 };
 
 module.exports.createUser = (req, res, next) => {
-  const {
-    name, about, avatar, email, password
-  } = req.body;
+  const { name, about, avatar, email, password } = req.body;
 
   bcrypt
     .hash(password, 12)
@@ -80,34 +78,38 @@ module.exports.createUser = (req, res, next) => {
 };
 
 module.exports.updateUserInfo = (req, res, next) => {
-  const { name, about } = req.body;
+  const { email, name } = req.body;
 
   User.findByIdAndUpdate(
     req.user._id,
-    { name, about },
-    {
-      new: true,
-      runValidators: true,
-      upsert: false,
-    }
+    { email, name },
+    { new: true, runValidators: true }
   )
     .then((user) => {
       if (!user) {
         throw new NotFoundError(`Пользователь с id: ${req.user._id} не найден`);
-      } else {
-        res.send({ data: user });
       }
+      res.send({ data: user });
     })
     .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new BadRequestError(NON_CORRECT_ID));
+        return;
+      }
       if (err.name === 'ValidationError') {
         next(
           new BadRequestError(
             'Переданы некорректные данные в методы обновления профиля'
           )
         );
-      } else {
-        next(err);
+        return;
       }
+
+      if (err.code === 11000) {
+        next(new ConflictError('Этот юзер уже часть базы'));
+        return;
+      }
+      next(err);
     });
 };
 
