@@ -8,8 +8,10 @@ const ExistError = require('../errors/existError');
 const created = 201;
 
 module.exports.getUserById = (req, res, next) => {
+  console.log(1);
   User.findById(req.params.userId)
     .then((users) => {
+      console.log(2);
       if (!users) {
         throw new NotFoundError('Такого пользователя нет');
       } else {
@@ -17,6 +19,7 @@ module.exports.getUserById = (req, res, next) => {
       }
     })
     .catch((err) => {
+      console.log(3);
       if (err.name === 'CastError') {
         next(new BadRequestError('Ошибка в запросе'));
       } else {
@@ -27,7 +30,6 @@ module.exports.getUserById = (req, res, next) => {
 
 module.exports.getCurrentUser = (req, res, next) => {
   const { _id } = req.user;
-
   User.findById(_id)
     .orFail(() => {
       throw new NotFoundError(`Пользователь c id: ${_id} не найден`);

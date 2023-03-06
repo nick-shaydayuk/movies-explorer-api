@@ -1,37 +1,32 @@
-require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
+const cors = require('cors');
+const helmet = require('helmet');
+const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 const { errors } = require('celebrate');
-const routes = require('./routes/loginRoutes');
-
-const { PORT = 3000 } = process.env;
+const limiter = require('./middlewares/rateLimiter');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
+const router = require('./routes/loginRoutes');
+/* const handleError = require('./middlewares/error-handler'); */
+const corsOptions = require('./middlewares/cors');
+const { PORT, MONGO_PORT } = require('./utils/config');
 
 const app = express();
 
-mongoose.connect('mongodb://localhost:27017/movies', {
-  useNewUrlParser: true,
-});
+mongoose.connect(MONGO_PORT);
 
-mongoose.connect(NODE_ENV === 'production' ? DATA_BASE : 'mongodb://localhost:27017/movies', {
-  useNewUrlParser: true,
-  useCreateIndex: true,
-  useFindAndModify: false,
-});
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-app.use(routes);
-
+app.use(helmet());
+app.use(requestLogger);
+app.use(limiter);
+app.use(cors(corsOptions));
+app.use(bodyParser.json());
+app.use(cookieParser());
+app.use(router);
+app.use(errorLogger);
 app.use(errors());
+/* app.use(handleError); */
 
-app.use((err, req, res, next) => {
-  const { statusCode = 500, message } = err;
-
-  res.status(statusCode).send({
-    message: statusCode === 500 ? 'На сервере произошла ошибка' : message,
-  });
-  next();
+app.listen(PORT, () => {
+  console.log(`Приложение работает. Порт: ${PORT}`);
 });
-
-app.listen(PORT);

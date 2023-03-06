@@ -5,7 +5,6 @@ const movieRoutes = require('./movieRoutes');
 const auth = require('../middlewares/auth');
 const { login } = require('../controllers/login');
 const { createUser } = require('../controllers/users');
-const { URL_REGEX } = require('../utils/constants');
 
 router.post(
   '/signup',
@@ -14,8 +13,6 @@ router.post(
       email: Joi.string().email().required(),
       password: Joi.string().required(),
       name: Joi.string().min(2).max(30),
-      about: Joi.string().min(2).max(30),
-      avatar: Joi.string().regex(URL_REGEX),
     }),
   }),
   createUser
