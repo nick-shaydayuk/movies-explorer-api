@@ -8,10 +8,8 @@ const ExistError = require('../errors/existError');
 const created = 201;
 
 module.exports.getUserById = (req, res, next) => {
-  console.log(1);
   User.findById(req.params.userId)
     .then((users) => {
-      console.log(2);
       if (!users) {
         throw new NotFoundError('Такого пользователя нет');
       } else {
@@ -19,7 +17,6 @@ module.exports.getUserById = (req, res, next) => {
       }
     })
     .catch((err) => {
-      console.log(3);
       if (err.name === 'CastError') {
         next(new BadRequestError('Ошибка в запросе'));
       } else {
@@ -41,39 +38,40 @@ module.exports.getCurrentUser = (req, res, next) => {
 };
 
 module.exports.createUser = (req, res, next) => {
-  const { name, about, avatar, email, password } = req.body;
+  const { name, email, password } = req.body;
 
   bcrypt
-    .hash(password, 12)
-    .then((hash) => {
+    .hash(password, 10)
+    .then((hash) =>
       User.create({
-        name,
-        about,
-        avatar,
         email,
         password: hash,
+        name,
+      })
+    )
+    .then((data) => {
+      res.status(created).send({
+        _id: data._id,
+        email: data.email,
+        name: data.name,
       });
     })
-    .then((user) => {
-      const { password: removed, ...rest } = user.toObject();
-      return res.status(created).send({ data: rest });
-    })
     .catch((err) => {
+      if (err.code === 11000) {
+        next(new ExistError('existing'));
+        return;
+      }
       if (err.name === 'ValidationError') {
         next(
           new BadRequestError(
-            'Переданы некорректные данные в методы создания пользователя'
+            `${Object.values(err.errors)
+              .map((error) => error.message)
+              .join(' ')}`
           )
         );
-      } else if (err.code === 11000) {
-        next(
-          new ExistError(
-            'Пользователь с таким электронным адресом уже существует'
-          )
-        );
-      } else {
-        next(err);
+        return;
       }
+      next(err);
     });
 };
 

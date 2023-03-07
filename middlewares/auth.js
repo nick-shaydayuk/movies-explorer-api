@@ -3,7 +3,6 @@ const AuthorizationError = require('../errors/authorizationError');
 
 module.exports = (req, res, next) => {
   const { token } = req.cookies;
-  console.log(1, 2, token);
   if (!token) {
     next(new AuthorizationError('Вы не авторизированы'));
     return;

@@ -56,6 +56,12 @@ const validationCreateMovie = celebrate({
     movieId: Joi.number().required(),
     nameRU: Joi.string().required(),
     nameEN: Joi.string().required(),
+    owner: Joi.object().keys({
+      email: Joi.string()
+        .required()
+        .email({ tlds: { allow: false } }),
+      name: Joi.string().required(),
+    }),
   }),
 });
 
