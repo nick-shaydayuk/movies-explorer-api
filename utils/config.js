@@ -1,8 +1,8 @@
 require('dotenv').config();
 
 const {
-  NODE_ENV,
-  PORT = 3001,
+  NODE_ENV = 'production',
+  PORT = 3002,
   MONGO_PORT = 'mongodb://localhost:27017/movies',
   JWT_SECRET = 'dev-secret',
 } = process.env;

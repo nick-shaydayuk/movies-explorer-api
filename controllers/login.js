@@ -13,6 +13,7 @@ module.exports.login = (req, res, next) => {
         maxAge: 3600 * 24 * 1000 * 7,
         secure: true,
         httpOnly: true,
+        sameSite: false,
       })
       .send({ message: 'ура' });
     })
