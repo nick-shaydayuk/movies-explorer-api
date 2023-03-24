@@ -4,7 +4,7 @@ const userRouter = require('./usersRouter');
 const movieRoutes = require('./movieRoutes');
 const auth = require('../middlewares/auth');
 const { login } = require('../controllers/login');
-const { createUser } = require('../controllers/users');
+const { createUser, signOut } = require('../controllers/users');
 
 router.post(
   '/signup',
@@ -31,6 +31,8 @@ router.post(
 router.use(auth);
 router.use('/users', userRouter);
 router.use('/movies', movieRoutes);
+
+router.use('/signout', signOut);
 
 router.use('/', (req, res, next) => {
   next(res.status(404).send({ message: 'Страница не найдена' }));

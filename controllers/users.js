@@ -139,3 +139,7 @@ module.exports.updateUserAvatar = (req, res, next) => {
       }
     });
 };
+
+module.exports.signOut = (req, res) => {
+  res.clearCookie('token').send({ message: 'маты - бан' });
+};

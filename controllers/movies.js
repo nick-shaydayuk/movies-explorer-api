@@ -9,10 +9,7 @@ const ok = 200;
 module.exports.getAllMovies = (req, res, next) => {
   Movie.find()
     .then((movies) => {
-      const result = movies.filter(
-        (film) => req.user._id === film.owner.toString()
-      );
-      res.send(result);
+      res.send(movies);
     })
     .catch(next);
 };
@@ -64,10 +61,6 @@ module.exports.deleteMovieById = (req, res, next) => {
         next(new NotFoundError(NOT_FOUND_MOVIE));
         return;
       }
-      // if (movie.owner.toString() !== req.user._id) {
-      //   next(new ForbiddenError());
-      //   return;
-      // }
       movie
         .remove()
         .then(() => res.send({ message: movie }))
