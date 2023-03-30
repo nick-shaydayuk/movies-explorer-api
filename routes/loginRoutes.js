@@ -4,8 +4,7 @@ const userRouter = require('./usersRouter');
 const movieRoutes = require('./movieRoutes');
 const auth = require('../middlewares/auth');
 const { login } = require('../controllers/login');
-const { createUser } = require('../controllers/users');
-const { URL_REGEX } = require('../utils/constants');
+const { createUser, signOut } = require('../controllers/users');
 
 router.post(
   '/signup',
@@ -14,8 +13,6 @@ router.post(
       email: Joi.string().email().required(),
       password: Joi.string().required(),
       name: Joi.string().min(2).max(30),
-      about: Joi.string().min(2).max(30),
-      avatar: Joi.string().regex(URL_REGEX),
     }),
   }),
   createUser
@@ -34,6 +31,8 @@ router.post(
 router.use(auth);
 router.use('/users', userRouter);
 router.use('/movies', movieRoutes);
+
+router.use('/signout', signOut);
 
 router.use('/', (req, res, next) => {
   next(res.status(404).send({ message: 'Страница не найдена' }));

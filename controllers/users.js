@@ -27,7 +27,6 @@ module.exports.getUserById = (req, res, next) => {
 
 module.exports.getCurrentUser = (req, res, next) => {
   const { _id } = req.user;
-
   User.findById(_id)
     .orFail(() => {
       throw new NotFoundError(`Пользователь c id: ${_id} не найден`);
@@ -39,73 +38,76 @@ module.exports.getCurrentUser = (req, res, next) => {
 };
 
 module.exports.createUser = (req, res, next) => {
-  const {
-    name, about, avatar, email, password
-  } = req.body;
+  const { name, email, password } = req.body;
 
   bcrypt
-    .hash(password, 12)
-    .then((hash) => {
+    .hash(password, 10)
+    .then((hash) =>
       User.create({
-        name,
-        about,
-        avatar,
         email,
         password: hash,
+        name,
+      })
+    )
+    .then((data) => {
+      res.status(created).send({
+        _id: data._id,
+        email: data.email,
+        name: data.name,
       });
     })
-    .then((user) => {
-      const { password: removed, ...rest } = user.toObject();
-      return res.status(created).send({ data: rest });
-    })
     .catch((err) => {
+      if (err.code === 11000) {
+        next(new ExistError('existing'));
+        return;
+      }
       if (err.name === 'ValidationError') {
         next(
           new BadRequestError(
-            'Переданы некорректные данные в методы создания пользователя'
+            `${Object.values(err.errors)
+              .map((error) => error.message)
+              .join(' ')}`
           )
         );
-      } else if (err.code === 11000) {
-        next(
-          new ExistError(
-            'Пользователь с таким электронным адресом уже существует'
-          )
-        );
-      } else {
-        next(err);
+        return;
       }
+      next(err);
     });
 };
 
 module.exports.updateUserInfo = (req, res, next) => {
-  const { name, about } = req.body;
+  const { email, name } = req.body;
 
   User.findByIdAndUpdate(
     req.user._id,
-    { name, about },
-    {
-      new: true,
-      runValidators: true,
-      upsert: false,
-    }
+    { email, name },
+    { new: true, runValidators: true }
   )
     .then((user) => {
       if (!user) {
         throw new NotFoundError(`Пользователь с id: ${req.user._id} не найден`);
-      } else {
-        res.send({ data: user });
       }
+      res.send({ data: user });
     })
     .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new BadRequestError(NON_CORRECT_ID));
+        return;
+      }
       if (err.name === 'ValidationError') {
         next(
           new BadRequestError(
             'Переданы некорректные данные в методы обновления профиля'
           )
         );
-      } else {
-        next(err);
+        return;
       }
+
+      if (err.code === 11000) {
+        next(new ConflictError('Этот юзер уже часть базы'));
+        return;
+      }
+      next(err);
     });
 };
 
@@ -136,4 +138,8 @@ module.exports.updateUserAvatar = (req, res, next) => {
         next(err);
       }
     });
+};
+
+module.exports.signOut = (req, res) => {
+  res.clearCookie('token').send({ message: 'маты - бан' });
 };

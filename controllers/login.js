@@ -9,7 +9,13 @@ module.exports.login = (req, res, next) => {
       const token = jwt.sign({ _id: user._id }, 'secret-key', {
         expiresIn: '7d',
       });
-      res.cookie({ httpOnly: true }).send({ token });
+      res.cookie('token', token, {
+        maxAge: 3600 * 24 * 1000 * 7,
+        secure: true,
+        httpOnly: true,
+        sameSite: false,
+      })
+      .send({ message: 'ура' });
     })
     .catch(next);
 };

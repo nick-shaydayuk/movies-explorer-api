@@ -39,12 +39,12 @@ const userMovie = new mongoose.Schema({
     match: [URL_REGEX, 'Некорректный формат ссылки'],
   },
   owner: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Object,
     ref: 'user',
     required: true,
   },
   movieId: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Number,
     required: true,
   },
   nameRU: {
