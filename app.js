@@ -8,7 +8,6 @@ const { errors } = require('celebrate');
 const limiter = require('./middlewares/rateLimiter');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const router = require('./routes/loginRoutes');
-/* const handleError = require('./middlewares/error-handler'); */
 const corsOptions = require('./middlewares/cors');
 const { PORT, MONGO_PORT } = require('./utils/config');
 
@@ -25,7 +24,6 @@ app.use(cookieParser());
 app.use(router);
 app.use(errorLogger);
 app.use(errors());
-/* app.use(handleError); */
 
 app.listen(PORT, () => {
   console.log(`Приложение работает. Порт: ${PORT}`);
