@@ -1,4 +1,4 @@
-const allowedCors = 'https://getaway.nomoredomains.work'//'http://localhost:3000';
+const allowedCors = 'http://localhost:3000'//1'https://getaway.nomoredomains.work';
 
 const corsOptions = {
   credentials: true,

@@ -104,7 +104,7 @@ module.exports.updateUserInfo = (req, res, next) => {
       }
 
       if (err.code === 11000) {
-        next(new ConflictError('Этот юзер уже часть базы'));
+        next(new ExistError('Этот юзер уже часть базы'));
         return;
       }
       next(err);
