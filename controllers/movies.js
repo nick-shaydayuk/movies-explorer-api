@@ -1,19 +1,19 @@
 const Movie = require('../models/movie');
 
 const BadRequestError = require('../errors/badRequest');
-const ForbiddenError = require('../errors/forbiddenError');
 const NotFoundError = require('../errors/notFoundError');
-
-const ok = 200;
+const NOT_FOUND_MOVIE = require('../utils/constants');
 
 module.exports.getAllMovies = (req, res, next) => {
-  Movie.find()
+  console.log(req.user._id);
+  Movie.find({ owner: req.user._id })
     .then((movies) => {
+      console.log(movies);
       res.send(movies);
     })
     .catch(next);
 };
-
+//{owner: req.user._id}
 module.exports.createMovie = (req, res, next) => {
   const {
     country,
@@ -26,9 +26,10 @@ module.exports.createMovie = (req, res, next) => {
     nameRU,
     nameEN,
     thumbnail,
-    owner,
     movieId,
   } = req.body;
+
+  console.log(req.user._id);
 
   Movie.create({
     country,
@@ -41,7 +42,7 @@ module.exports.createMovie = (req, res, next) => {
     nameRU,
     nameEN,
     thumbnail,
-    owner,
+    owner: req.user._id,
     movieId,
   })
     .then((movie) => res.send(movie))

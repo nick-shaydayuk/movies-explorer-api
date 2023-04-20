@@ -39,8 +39,7 @@ const userMovie = new mongoose.Schema({
     match: [URL_REGEX, 'Некорректный формат ссылки'],
   },
   owner: {
-    type: Object,
-    ref: 'user',
+    type: String,
     required: true,
   },
   movieId: {
