@@ -5,15 +5,13 @@ const NotFoundError = require('../errors/notFoundError');
 const NOT_FOUND_MOVIE = require('../utils/constants');
 
 module.exports.getAllMovies = (req, res, next) => {
-  console.log(req.user._id);
   Movie.find({ owner: req.user._id })
     .then((movies) => {
-      console.log(movies);
       res.send(movies);
     })
     .catch(next);
 };
-//{owner: req.user._id}
+
 module.exports.createMovie = (req, res, next) => {
   const {
     country,
@@ -28,9 +26,6 @@ module.exports.createMovie = (req, res, next) => {
     thumbnail,
     movieId,
   } = req.body;
-
-  console.log(req.user._id);
-
   Movie.create({
     country,
     director,
